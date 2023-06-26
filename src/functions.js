@@ -3,70 +3,138 @@ const fs = require('fs');
 const { markAsUntransferable } = require('worker_threads');
 const { JSDOM } = require('jsdom');
 const MarkdownIt = require('markdown-it');
+const { error } = require('console');
+
 
 // Valida el archivo
-const validateFile = (filePath => {
-    if (fs.existsSync(filePath)) {
-        console.log('El archivo existe:', filePath);
-    } else {
-        console.error('El archivo no existe:', filePath);
-    }
-});
-
-// Valida si la ruta es absoluta o relativa, en el último caso, la convierte
-const files = (filePath) => {
-    const isAbsolute = path.isAbsolute(filePath);
-    if (isAbsolute) {
-        console.log('La ruta es absoluta.');
-        console.log('Archivo a revisar:', filePath);
-        console.log(filePath);
-        validateFile(filePath);
-    } else {
-        console.log('La ruta es relativa.');
-        const absolutePath = path.join(__dirname, filePath);
-        console.log(absolutePath);
-        console.log('Archivo a revisar:', filePath);
-        validateFile(absolutePath);
-    }
-};
-
-// Revisa si es un directorio, si es, despliega los archivos dentro
-const readDirectory = (directoryPath) => {
-    try {
-        const files = fs.readdirSync(directoryPath);
-        console.log('Archivos en el directorio:', files);
-    } catch (error) {
-        console.error('Error al leer el directorio', error);
-    }
+function validateFile(filePath) {
+    return fs.existsSync(filePath);
 }
 
-//Lee el archivo
-const readTextFile = (filePath) => {
-    const currentFilePath = __filename;
-    const absolutePath = path.resolve(path.dirname(currentFilePath), filePath);
-    console.log(absolutePath);
-    fs.readFile(absolutePath, 'utf-8', (error, data) => {
-        if (error) {
-            console.error('Error al leer el archivo:', error);
-        } else {
-            console.log(data);
-        }
+// Valida si la ruta es absoluta 
+const isAbsolute = (filePath) => path.isAbsolute(filePath); //isAbsolute
+
+//Convierte la ruta relativa a absoluta
+//const absolutePath = (filePath) => path.join(__dirname, filePath);
+const absolutePath = (filePath) => path.resolve(filePath);
+//Es un archivo
+const isAFile = (filePath) => {
+    return fs.statSync(filePath).isFile();
+};
+
+// const files = (filePath) => {
+//     const isAbsolute = path.isAbsolute(filePath); //isAbsolute
+//     if (isAbsolute) {
+//         console.log('La ruta es absoluta.');
+//         console.log('Archivo a revisar:', filePath);
+//         console.log(filePath);
+//         validateFile(filePath);
+//     } else {
+//         console.log('La ruta es relativa.');
+//         const absolutePath = path.join(__dirname, filePath); //converterAbsolute
+//         console.log(absolutePath);
+//         console.log('Archivo a revisar:', filePath);
+//         validateFile(absolutePath);
+//     }
+// };
+
+
+
+// Revisa si es un directorio
+const isADirectory = (filePath) => fs.statSync(filePath).isDirectory();
+
+//Leer archivos de un directorio 
+const readDirectory = (filePath) => {
+    // try {
+    //     const files = fs.readdirSync(directoryPath); // revisar y hacer el cambio con readdir
+    //     console.log('Archivos en el directorio:', files);
+    // } catch (error) {
+    //     console.error('Error al leer el directorio', error);
+    // }
+    return new Promise ((resolve, reject) =>{
+        fs.readdir(filePath, "utf-8", (error, routes) =>{
+            if (error){
+                reject(error);
+            } else{
+                const arrayMd = [];
+                routes.forEach((file) =>{
+                    const resultExt = path.extname(file);
+                    if (resultExt === ".md"){
+                        const routeAbsolute = path.resolve(filePath, file);
+                        arrayMd.push(routeAbsolute);
+                    }
+                });
+                resolve(arrayMd);
+            }
+        });
     });
 };
 
+//Lee el archivo
+const readTextFile = (filePath) => {
+    return new Promise((resolve, reject) => {
+        // const currentFilePath = __filename;
+        // const absolutePath = path.resolve(path.dirname(currentFilePath), filePath);
+
+        fs.readFile(filePath, 'utf-8', (error, data) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data);
+            }
+    });
+});
+};
+
 // Valida si la extensión es .md
-const validateMd = (filePath) => {
+const validateMd = (filePath) => { // isMd
     const extension = path.extname(filePath);
-    console.log(extension);
+    //console.log(extension);
     if (extension === '.md') {
-        console.log('Es un archivo Markdown.');
+        //console.log('Es un archivo Markdown.');
+        return true;
     } else {
-        console.log('No es un archivo Markdown');
+        //console.log('No es un archivo Markdown');
+        return false;
     }
 };
 
 // Revisa si hay links dentro del archivo y los extrae 
-const extractLinks = (filePath, fileName) => {
+
+const extractLinks = (data, fileName) =>{
+    // console.log(filePath, 'Extract Links argumentos');
+    // const promiseReadFile = (resolve, reject) => {
+    //     fs.readFile(filePath, 'utf-8', (error, mdContent) => {
+    //         if (error) {
+    //             reject (error);
+    //         } else {
+                const allLinks = [];
+                //const mdRender = new MarkdownIt();
+                const mdRender = MarkdownIt();
+                const renderHtml = mdRender.render(data);
+                const dom = new JSDOM(renderHtml);
+                const { document } = dom.window;
+                const links = document.querySelectorAll('a');
+    
+                links.forEach((link) => {
+                    const href = link.getAttribute('href');
+                    const text = link.textContent.slice(0, 50);
+                    if (href.startsWith('https://') || href.startsWith('http://')) {
+                        allLinks.push({ href, text, fileName });
+                    }
+                });
+                return(allLinks);
+                
+            };
+    
+//         });
+//     }
+//     return new Promise(promiseReadFile);
+
+// }
+
+const extractLinks2 = (filePath, fileName) => {
+    
     fs.readFile(filePath, 'utf-8', (error, mdContent) => {
         if (error) {
             console.error('Error al leer el archivo:', error);
@@ -85,16 +153,17 @@ const extractLinks = (filePath, fileName) => {
                     allLinks.push({ href, text, fileName });
                 }
             });
-            console.log(allLinks);
-            //return allLinks;
+            return allLinks;
+            console.log(allLinks, 'estos son los links');
+            
         }
 
     });
 };
 
-// Verifica los links
+// Verifica si son vàlidos los links
 const verifyLinks = (links) => {
-    console.log(links);
+    //console.log(links);
     const arrayPromise = links.map((link) => {
         return new Promise((resolve, reject) => {
             fetch(link.href)
@@ -123,56 +192,19 @@ const verifyLinks = (links) => {
     return Promise.all(arrayPromise);
 };
 
-// const verifyLinks2 = (links) => {
-//     if (!Array.isArray(links)) {
-//         return Promise.reject(new Error('Invalid links array'));
-//     }
-//     return Promise.all(links.map((link) => fetch(link.href)
-//         .then((response) => {
-//             const result = {
-//                 Ruta: link.file,
-//                 Texto: link.text,
-//                 Link: link.href,
-//                 Codigo: response.status === 200 ? 200 : 404,
-//                 Estado: response.status === 200 ? 'OK' : 'FAIL',
-//             };
-//             return result;
-//             console.log(result);
-//         })
-//         .catch((error) => {
-//             const result = {
-//                 Ruta: link.file,
-//                 Texto: link.text,
-//                 Link: link.href,
-//                 Codigo: error.name,
-//                 Estado: error.message,
-//             };
-//             return result;
-//             console.log(result);
-//         })
-//     )
-//     );
-// };
 
-validateFile('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/index.js');
-files('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/index.js');
-files('index.js');
-readTextFile('text.txt');
-readTextFile('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/prueba.md');
-validateMd('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/prueba.md');
-readDirectory('./pruebas');
-extractLinks('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md', 'C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md')
-// .then((links) => {
-//     verifyLinks(links);
-// })
-// .then((results) => {
-//     console.log(results);
-// })
-// .catch((error) => {
-//     console.error(error)
-// });
+
+// validateFile('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/index.js');
+// absolutePath('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/index.js');
+// absolutePath('index.js');
+// readTextFile('text.txt');
+// readTextFile('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/prueba.md');
+// validateMd('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/prueba.md');
+// readDirectory('./pruebas');
+// extractLinks('C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md', 'C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md')
+
 const arrayLinks = [{
-    href: 'https://nodejs.org/es/',
+    href: 'ttps://nodejs.org/es/',
     text: 'Node.js',
     fileName: 'C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md'},
 {
@@ -181,19 +213,23 @@ const arrayLinks = [{
     fileName: 'C:/Users/cuc22/Documents/Laboratoria/MD-Links/DEV006-md-links/src/pruebas/prueba2.md'}
 ];
 
-verifyLinks(arrayLinks)
-  .then((results) => {
-    console.log(results);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+// verifyLinks(arrayLinks)
+//   .then((results) => {
+//     console.log(results);
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
 module.exports = {
             validateFile,
             readTextFile,
-            files,
+            isAFile,
+            isAbsolute,
+            absolutePath,
             validateMd,
+            isADirectory,
             readDirectory,
             extractLinks,
+            verifyLinks
         };

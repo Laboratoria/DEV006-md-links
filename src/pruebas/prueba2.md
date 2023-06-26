@@ -1,4 +1,4 @@
-[Markdown](https://es.wikipedia.org/wiki/Markdown)
+(tps://es.wikipedia.org/wiki/Markdown)
 https://es.wikipedia.org/wiki/Markdown
 http://es.wikipedia.org/wiki/Markdown
 [Node.js](https://nodejs.org/)
@@ -7,9 +7,6 @@ http://es.wikipedia.org/wiki/Markdown
 construido con el [motor de JavaScript V8 de Chrome](https://developers.google.com/v8/).
 * [Arreglos](https://curriculum.laboratoria.la)
   * [Array - MDN](https://developer.mozilla.org)
-  * [Array.prototype.sort() - MDN](https://developer.mozilla.org)
-  * [Array.prototype.forEach() - MDN](https://developer.mozilla.org)
-  * [Array.prototype.map() - MDN](https://developer.mozilla.org)
-  * [Array.prototype.filter() - MDN](https://developer.mozilla.org)
-  * [Array.prototype.reduce() - MDN](https://developer.mozilla.org)
+  * [Array.prototype.sort() - MDN](https://developer.mozzzzzzilla.org)
+
 

@@ -16,7 +16,7 @@ function mdLinks(path,options){
         const resolveIsAbsolute = isAbsolute(path) ? path : absolutePath(path);
         //console.log(resolveIsAbsolute,'absolute');
         if (validateFile(resolveIsAbsolute)){
-            console.log(validateFile,'validatefileeee');
+            console.log(validateFile,'validatefile');
             if (isAFile(resolveIsAbsolute)){
                 console.log('Is a file');
                 const resultIsMd = validateMd(resolveIsAbsolute);
@@ -30,16 +30,12 @@ function mdLinks(path,options){
                     //console.log(result,'result');
                     const extract = extractLinks(result, resolveIsAbsolute);
                     console.log(extract, 'extract');
-                    // extract.then((links)=>{ Dani
-                    //     console.log(links);
-                    // }).catch((error)=>{
-                    //     console.log(error);
-                    // }); hasta aqui lo de Dani
                     if (options.validate === false){
                         resolve(extract);
                     }    
                         else{
-                        resolve(verifyLinks(extract))
+                        //resolve(verifyLinks(extract))
+                        verifyLinks(extract)
                         .then((results) =>{
                             const errors = results.filter((result) => result.Codigo !== 200);
                             if (errors.length > 0) {
@@ -53,7 +49,6 @@ function mdLinks(path,options){
                                 });
                             }
                             resolve(errors);
-                            //);
                         })
                         .catch(reject);
                     }
@@ -68,16 +63,20 @@ function mdLinks(path,options){
                         readTextFile(link).then((result)=>{
                             const extract = extractLinks(result, link);
                             if (options.validate === false){
+                                console.log(extract,'extract de directory');
                                 return extract;
+                                
                             } else {
                                 return verifyLinks(extract);
                             }
                         })
+                        .catch(reject)
                         );
                         Promise.all(promises)
                         .then ((results) =>{
                             const flatAllResults = results.flat();
                             resolve(flatAllResults);
+                            console.log(flatAllResults, 'flat results');
                         })
                         .catch (reject);
                     })
@@ -90,8 +89,8 @@ function mdLinks(path,options){
     });
 }
 
-const path = ('pruebas/prueba2.md');
-const options = {validate: true};
+const path = ('pruebas');
+const options = {validate: false};
 const resultFunction = mdLinks(path, options);
 console.log(resultFunction, 'Resultado de la función!');
 resultFunction

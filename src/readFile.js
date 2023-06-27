@@ -1,7 +1,9 @@
 const fs = require ('fs');
 const readLine = require ('readline');
+const path = require ('path');
 
 function readFile(file){
+  const nameFile = path.basename(file);
   return new Promise((resolve, reject)=>{
     const lines = [];
     const reader = readLine.createInterface({
@@ -10,12 +12,16 @@ function readFile(file){
       terminal: false
     });
 
-    const markdownLinkRegex = /\((http[s]?:\/\/[^)]+)\)/gi; // Expresion Regular para ver si es link 
+    const markdownLinkRegex = /\[([^\]]+)\]\((http[s]?:\/\/[^)]+)\)/gi; // Expresion Regular para ver si es link 
 
     reader.on('line',(line) =>{
       let matches = line.matchAll(markdownLinkRegex);
       for (let match of matches) {
-        lines.push(match[1]); // El primer grupo de captura contiene la URL
+        lines.push({
+          href: match[2],
+          name: nameFile,
+          text: match[1] // El primer grupo de captura contiene la URL
+        }); 
       }
     });
 

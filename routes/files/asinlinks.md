@@ -1,7 +1,4 @@
-Hola
-Care
-Culo
-Si funciona!
+
 [Markdown](https://es.wikipedia.org/wiki/Markdown) es un lenguaje de marcado
 ligero muy popular entre developers. Es usado en muchísimas plataformas que
 manejan texto plano (GitHub, foros, blogs, ...) y es muy común
@@ -12,3 +9,8 @@ Dentro de una comunidad de código abierto, nos han propuesto crear una
 herramienta usando [Node.js](https://nodejs.org/), que lea y analice archivos
 en formato `Markdown`, para verificar los links que contengan y reportar
 algunas estadísticas.
+
+Por ejemplo, el [`course-parser`](https://github.com/Laboratoria/course-parser458)
+que usamos para la currícula no está publicado en el registro público de NPM,
+así que lo instalamos directamente desde GitHub con el comando `npm install
+Laboratoria/course-parser`.

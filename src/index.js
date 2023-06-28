@@ -16,11 +16,11 @@ function mdLinks(path,options){
         const resolveIsAbsolute = isAbsolute(path) ? path : absolutePath(path);
         //console.log(resolveIsAbsolute,'absolute');
         if (validateFile(resolveIsAbsolute)){
-            console.log(validateFile,'validatefile');
+            //console.log(validateFile,'validatefile');
             if (isAFile(resolveIsAbsolute)){
                 console.log('Is a file');
                 const resultIsMd = validateMd(resolveIsAbsolute);
-                console.log(resultIsMd, 'Este One');
+                //console.log(resultIsMd, 'Este One');
                 if(resultIsMd === false){
                     reject('Error: No es un archivo .md');
                 }
@@ -29,28 +29,28 @@ function mdLinks(path,options){
                 .then((result) => {
                     //console.log(result,'result');
                     const extract = extractLinks(result, resolveIsAbsolute);
-                    console.log(extract, 'extract');
+                    console.log(extract, 'Extracto de links');
                     if (options.validate === false){
                         resolve(extract);
                     }    
                         else{
                         //resolve(verifyLinks(extract))
-                        verifyLinks(extract)
-                        .then((results) =>{
-                            const errors = results.filter((result) => result.Codigo !== 200);
-                            if (errors.length > 0) {
-                                console.log('Los siguientes enlaces son los inválidos:');
-                                errors.forEach((error) => {
-                                    console.log(`- Ruta: ${error.Ruta}`);
-                                    console.log(`  Texto: ${error.Texto}`);
-                                    console.log(`  Enlace: ${error.Link}`);
-                                    console.log(`  Código: ${error.Codigo}`);
-                                    console.log(`  Estado: ${error.Estado}`);
-                                });
-                            }
-                            resolve(errors);
-                        })
-                        .catch(reject);
+                    verifyLinks(extract)
+                         .then((results) =>{
+                             const errors = results.filter((result) => result.Codigo !== 200);
+                             if (errors.length > 0) {
+                                 console.log('Los siguientes enlaces son los inválidos:');
+                                 errors.forEach((error) => {
+                                     console.log(`- Ruta: ${error.Ruta}`);
+                                     console.log(`  Texto: ${error.Texto}`);
+                                     console.log(`  Enlace: ${error.Link}`);
+                                     console.log(`  Código: ${error.Codigo}`);
+                                     console.log(`  Estado: ${error.Estado}`);
+                                 });
+                             }
+                             resolve(errors);
+                         })
+                         .catch(reject);
                     }
                 })
                 .catch(reject);
@@ -63,7 +63,7 @@ function mdLinks(path,options){
                         readTextFile(link).then((result)=>{
                             const extract = extractLinks(result, link);
                             if (options.validate === false){
-                                console.log(extract,'extract de directory');
+                                //console.log(extract,'Extracto del directorio');
                                 return extract;
                                 
                             } else {
@@ -76,7 +76,7 @@ function mdLinks(path,options){
                         .then ((results) =>{
                             const flatAllResults = results.flat();
                             resolve(flatAllResults);
-                            console.log(flatAllResults, 'flat results');
+                            console.log(flatAllResults, 'Total de links del directorio');
                         })
                         .catch (reject);
                     })
@@ -89,13 +89,16 @@ function mdLinks(path,options){
     });
 }
 
-const path = ('pruebas');
-const options = {validate: false};
+//const path = ('../src/pruebas/prueba1.md');
+//const path = ('../src/pruebas/text.txt');
+const path = ('../src/pruebas/');
+const options = {validate: true};
 const resultFunction = mdLinks(path, options);
-console.log(resultFunction, 'Resultado de la función!');
+console.log(resultFunction, '¡Resultado de la función mdLinks!');
 resultFunction
 .then(function (result) {
-    console.log(result, 'Es este...')
+    //console.log(result, 'Es este...')
+    return result;
 })
 .catch(
     function (error) {

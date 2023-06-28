@@ -46,7 +46,7 @@ const readDirectory = (filePath) => {
                     // }
                 });
                 resolve(arrayMd);
-                console.log(arrayMd, 'Este es array md');
+                console.log(arrayMd, 'Estos son los archivos Markdown');
             }
         });
     });
@@ -116,6 +116,7 @@ const verifyLinks = (links) => {
                         Ruta: link.fileName,
                         Texto: link.text,
                         Link:link.href,
+                        //Codigo: error.name,
                         Codigo: error.name,
                         Estado: error.message, 
                     };

@@ -104,3 +104,7 @@ resultFunction
     function (error) {
     console.log(error)
 });
+
+module.exports = {
+    mdLinks,
+};

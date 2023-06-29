@@ -101,6 +101,7 @@ const verifyLinks = (links) => {
     const arrayPromise = links.map((link) => {
         return new Promise((resolve, reject) => {
             fetch(link.href)
+            //return global.fetch(link.href)
                 .then((response) =>{
                     const result ={
                         Ruta:link.fileName,
@@ -124,6 +125,7 @@ const verifyLinks = (links) => {
                 });
         });
     });
+    
     return Promise.all(arrayPromise);
 };
 

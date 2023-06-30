@@ -24,9 +24,10 @@ function mdLinks(path,options){
                 console.log(resultIsMd, 'Este One');
                 if(resultIsMd === false){
                     reject('Error: No es un archivo .md');
+                    return;
                 }
-                return (readTextFile(resolveIsAbsolute));
-                console.log(readTextFile,'result de readtextfile')
+                readTextFile(resolveIsAbsolute)
+                //console.log(readTextFile,'result de readtextfile')
                 .then((result) => {
                     console.log(result,'result');
                     const extract = extractLinks(result, resolveIsAbsolute);
@@ -35,18 +36,18 @@ function mdLinks(path,options){
                         resolve(extract);
                         //return extract;
                     }    else{
-                    resolve(verifyLinks(extract))
+                        verifyLinks(extract)
                     //verifyLinks(extract)
                     //return verifyLinks(extract);
                    
                         .then((results) =>{
                             resolve(results)
                         })
-                            //.catch(reject);
+                            .catch(reject);
                             }
                         })
                         .catch(reject);
-                    };
+                    }
                     
                             //  const errors = results.filter((result) => result.Codigo !== 200);
                             //  if (errors.length > 0) {
@@ -74,11 +75,12 @@ function mdLinks(path,options){
                         readTextFile(link).then((result)=>{
                             const extract = extractLinks(result, link);
                             if (options.validate === false){
-                                //console.log(extract,'Extracto del directorio');
+                                
                                 return extract;
                                 
                             } else {
                                 return verifyLinks(extract);
+                                
                             }
                         })
                         .catch(reject)
@@ -100,9 +102,9 @@ function mdLinks(path,options){
     });
 }
 
-//const path = ('../src/pruebas/prueba1.md');
+const path = ('../src/pruebas/prueba1.md');
 //const path = ('../src/pruebas/text.txt');
-const path = ('../src/pruebas/');
+//const path = ('../src/pruebas/');
 const options = {validate: true};
 const resultFunction = mdLinks(path, options);
 console.log(resultFunction, '¡Resultado de la función mdLinks!');

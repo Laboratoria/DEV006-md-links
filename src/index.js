@@ -10,51 +10,62 @@ const   {
     verifyLinks,
     readTextFile
         } = require("./functions");
+    const axios = require('axios');
 
 function mdLinks(path,options){
     return new Promise(function (resolve, reject){
         const resolveIsAbsolute = isAbsolute(path) ? path : absolutePath(path);
-        //console.log(resolveIsAbsolute,'absolute');
+        console.log(resolveIsAbsolute,'absolute');
         if (validateFile(resolveIsAbsolute)){
             //console.log(validateFile,'validatefile');
             if (isAFile(resolveIsAbsolute)){
                 console.log('Is a file');
                 const resultIsMd = validateMd(resolveIsAbsolute);
-                //console.log(resultIsMd, 'Este One');
+                console.log(resultIsMd, 'Este One');
                 if(resultIsMd === false){
                     reject('Error: No es un archivo .md');
                 }
-                readTextFile(resolveIsAbsolute)
-                //console.log(result,'result de readtextfile')
+                return (readTextFile(resolveIsAbsolute));
+                console.log(readTextFile,'result de readtextfile')
                 .then((result) => {
-                    //console.log(result,'result');
+                    console.log(result,'result');
                     const extract = extractLinks(result, resolveIsAbsolute);
-                    console.log(extract, 'Extracto de links');
+                    console.log(extract, 'Extracto de liiiinks');
                     if (options.validate === false){
                         resolve(extract);
-                    }    
-                        else{
-                        //resolve(verifyLinks(extract))
-                    verifyLinks(extract)
-                         .then((results) =>{
-                             const errors = results.filter((result) => result.Codigo !== 200);
-                             if (errors.length > 0) {
-                                 console.log('Los siguientes enlaces son los inválidos:');
-                                 errors.forEach((error) => {
-                                     console.log(`- Ruta: ${error.Ruta}`);
-                                     console.log(`  Texto: ${error.Texto}`);
-                                     console.log(`  Enlace: ${error.Link}`);
-                                     console.log(`  Código: ${error.Codigo}`);
-                                     console.log(`  Estado: ${error.Estado}`);
-                                 });
-                             }
-                             resolve(errors);
-                         })
-                         .catch(reject);
-                    }
-                })
-                .catch(reject);
-                }
+                        //return extract;
+                    }    else{
+                    resolve(verifyLinks(extract))
+                    //verifyLinks(extract)
+                    //return verifyLinks(extract);
+                   
+                        .then((results) =>{
+                            resolve(results)
+                        })
+                            //.catch(reject);
+                            }
+                        })
+                        .catch(reject);
+                    };
+                    
+                            //  const errors = results.filter((result) => result.Codigo !== 200);
+                            //  if (errors.length > 0) {
+                            //      console.log('Los siguientes enlaces son los inválidos:');
+                            //      errors.forEach((error) => {
+                            //          console.log(`- Ruta: ${error.Ruta}`);
+                            //          console.log(`  Texto: ${error.Texto}`);
+                            //          console.log(`  Enlace: ${error.Link}`);
+                            //          console.log(`  Código: ${error.Codigo}`);
+                            //          console.log(`  Estado: ${error.Estado}`);
+                //                  });
+                //              }
+                //              resolve(errors);
+                //          })
+                //          .catch(reject);
+                //     }
+                // })
+                // .catch(reject);
+                // }
 
                 if (isADirectory(resolveIsAbsolute)){
                     readDirectory(resolveIsAbsolute)

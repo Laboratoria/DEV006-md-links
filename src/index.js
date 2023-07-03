@@ -36,9 +36,9 @@ function mdLinks(path,options){
                         resolve(extract);
                         //return extract;
                     }    else{
+                        //resolve(verifyLinks(extract))
                         verifyLinks(extract)
-                    //verifyLinks(extract)
-                    //return verifyLinks(extract);
+                        //return verifyLinks(extract);
                    
                         .then((results) =>{
                             resolve(results)
@@ -75,12 +75,11 @@ function mdLinks(path,options){
                         readTextFile(link).then((result)=>{
                             const extract = extractLinks(result, link);
                             if (options.validate === false){
-                                
                                 return extract;
                                 
                             } else {
                                 return verifyLinks(extract);
-                                
+                                console.log((verifyLinks(extract)), 'verifylinks');
                             }
                         })
                         .catch(reject)
@@ -101,16 +100,15 @@ function mdLinks(path,options){
             }
     });
 }
-
 const path = ('../src/pruebas/prueba1.md');
 //const path = ('../src/pruebas/text.txt');
 //const path = ('../src/pruebas/');
 const options = {validate: true};
 const resultFunction = mdLinks(path, options);
-console.log(resultFunction, '¡Resultado de la función mdLinks!');
+//console.log(resultFunction, '¡Resultado de la función mdLinks!');
 resultFunction
 .then(function (result) {
-    //console.log(result, 'Es este...')
+    console.log(result, 'Es este...')
     return result;
 })
 .catch(

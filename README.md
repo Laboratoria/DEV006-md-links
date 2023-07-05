@@ -26,7 +26,7 @@ Dentro de una comunidad de código abierto, es importante crear una herramienta 
 
 ## 3. Diagrama de Flujo
 
-![Diagrama de Flujo](C:\Users\cuc22\Documents\Laboratoria\MD-Links\DEV006-md-links\src\Diagrama de flujo MD Links.png)
+![Diagrama de Flujo](diagrama.png)
 
 
 ## 4. Consideraciones generales

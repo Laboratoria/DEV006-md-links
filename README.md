@@ -4,20 +4,17 @@
 
 * [1. Preámbulo](#1-preámbulo)
 * [2. Resumen del proyecto](#2-resumen-del-proyecto)
-* [3. Objetivos de aprendizaje](#3-diagrama-de-flujo)
-* [4. Consideraciones generales](#4-consideraciones-generales)
+* [3. Diagrama de Flujo](#3-diagrama-de-flujo)
+* [4. Tutorial](#4-tutorial)
 
 
 ***
 
 ## 1. Preámbulo
 
-[Markdown] Es un lenguaje de marcado ligero muy popular entre developers. Es usado en muchísimas plataformas que manejan texto plano (GitHub, foros, blogs, ...) y es muy común encontrar varios archivos en ese formato en cualquier tipo de repositorio.
+Markdown - Es un lenguaje de marcado ligero muy popular entre developers. Es usado en muchísimas plataformas que manejan texto plano (GitHub, foros, blogs, ...) y es muy común encontrar varios archivos en ese formato en cualquier tipo de repositorio.
 
-Estos archivos `Markdown` normalmente contienen _links_ (vínculos/ligas) que
-muchas veces están rotos o ya no son válidos y eso perjudica mucho el valor de
-la información que se quiere compartir.
-
+Estos archivos `Markdown` normalmente contienen _links_ (vínculos/ligas) que muchas veces están rotos o ya no son válidos y eso perjudica mucho el valor de la información que se quiere compartir.
 
 ## 2. Resumen del proyecto
 
@@ -28,35 +25,26 @@ Dentro de una comunidad de código abierto, es importante crear una herramienta 
 ![](src/diagrama.png)
 
 
-## 4. Consideraciones generales
+## 4. Tutorial
 
-* Este proyecto se debe "resolver" de manera individual.
+* Se lee una ruta.
 
-* El rango de tiempo estimado para completar el proyecto es de 4 a 5 Sprints.
+* Se revisa si existe o no.
 
-* La **librería** y el **script ejecutable** (herramienta de línea de comando -
-  CLI) deben estar implementados en JavaScript para ser ejecutados con
-  Node.js. **Está permitido usar librerías externas**.
+* Se determina si es relativa o absoluta. En caso de ser relativa, se convierte a aboluta.
 
-* Tu módulo **debe ser instalable** via `npm install <github-user>/md-links`. Este
-  módulo debe incluir tanto un _ejecutable_ que podamos invocar en la línea de
-  comando como una interfaz que podamos importar con `require` para usarlo
-  programáticamente.
+* Se analiza si es archivo o directorio.
 
-* Los **tests unitarios** deben cubrir un mínimo del 70% de _statements_,
-  _functions_, _lines_ y _branches_. Te recomendamos explorar [Jest](https://jestjs.io/)
-  para tus pruebas unitarias.
+* En caso de ser archivo, verifica si es markdown (.md).
 
-* Para este proyecto **no está permitido** utilizar `async/await`.
+* Se lee el archivo y se extraen los links encontrados.
 
-* Para este proyecto te sugerimos **no utilizar** la versión síncrona
-  de la función para leer archivos, `readFileSync`, y en cambio intentar
-  resolver este desafío de manera asíncrona.
+* Si el usuario desea validarlos, se validan. Los que son válidos manejan el estatus de OK y los que no, un código de error.
 
-* Para este proyecto es **opcional** el uso de ES Modules `(import/export)`, en el
-  caso optes utilizarlo deberás de crear un script de `build` en el `package.json`
-  que los transforme en `requires` y `module.exports` con ayuda de **babel**.
+* En caso de ser directorio, revisa de manera recursiva si dentro existen archivos markdown.
 
-* Para disminuir la complejidad de tu algoritmo recursivo, te recomendamos
-  utilizar la versión síncrona de la función para leer directorios, `readdirSync`.
+* Lee cada uno de ellos y realiza la función de archivo que vimos anteriormente, la diferencia es que agrupa los links que están dentro de los archivos .md encontrados en un sólo arreglo.
+
+* Termina la extracción o validación, según sea la elección del usuario.
+
 

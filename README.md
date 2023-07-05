@@ -18,7 +18,6 @@ Estos archivos `Markdown` normalmente contienen _links_ (vínculos/ligas) que
 muchas veces están rotos o ya no son válidos y eso perjudica mucho el valor de
 la información que se quiere compartir.
 
-![md-links](https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg)
 
 ## 2. Resumen del proyecto
 
@@ -26,7 +25,7 @@ Dentro de una comunidad de código abierto, es importante crear una herramienta 
 
 ## 3. Diagrama de Flujo
 
-![Diagrama de Flujo](diagrama.png)
+![](src/diagrama.png)
 
 
 ## 4. Consideraciones generales

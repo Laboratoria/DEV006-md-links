@@ -23,7 +23,7 @@ const helpOption = process.argv.includes('--help');
 
 
 if (helpOption) {
-    console.log(`${colors.green}Escriba la ruta y luego escriba verdadero para validar los enlaces, y falso para no hacerlo..${colors.reset}`);
+    console.log(`${colors.green}Escriba la ruta, luego escriba verdadero para validar los enlaces y falso para no hacerlo..${colors.reset}`);
 } else if ((optionsArgument !== true && optionsArgument !== false) && (!pathArgument || !fs.existsSync(pathArgument))) {
     console.log(`${colors.red}La ruta u opción proporcionada no es válida, inténtelo de nuevo.${colors.reset}`);
 } else if (optionsArgument !== true && optionsArgument !== false){

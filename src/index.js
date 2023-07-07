@@ -16,7 +16,29 @@ function mdLinks(path,options){
     return new Promise(function (resolve, reject){
         const resolveIsAbsolute = isAbsolute(path) ? path : absolutePath(path);
         if (validateFile(resolveIsAbsolute)){
-            if (isAFile(resolveIsAbsolute)){
+            if (isADirectory(resolveIsAbsolute)){
+                readDirectory(resolveIsAbsolute)
+                .then((result)=>{
+                    const promises = result.map((link) =>
+                    readTextFile(link).then((result)=>{
+                        const extract = extractLinks(result, link);
+                        if (options.validate === false){
+                            return extract;
+                        } else {
+                            return verifyLinks(extract);
+                        }
+                    })
+                    .catch(reject)
+                    );
+                    Promise.all(promises)
+                    .then ((results) =>{
+                        const flatAllResults = results.flat();
+                        resolve(flatAllResults);
+                    })
+                    .catch (reject);
+                })
+                .catch (reject);
+            } else if (isAFile(resolveIsAbsolute)){
                 const resultIsMd = validateMd(resolveIsAbsolute);
                 if(resultIsMd === false){
                     reject('Error: No es un archivo .md');
@@ -36,30 +58,7 @@ function mdLinks(path,options){
                             }
                         })
                         .catch(reject);
-                    }
-                if (isADirectory(resolveIsAbsolute)){
-                    readDirectory(resolveIsAbsolute)
-                    .then((result)=>{
-                        const promises = result.map((link) =>
-                        readTextFile(link).then((result)=>{
-                            const extract = extractLinks(result, link);
-                            if (options.validate === false){
-                                return extract;
-                            } else {
-                                return verifyLinks(extract);
-                            }
-                        })
-                        .catch(reject)
-                        );
-                        Promise.all(promises)
-                        .then ((results) =>{
-                            const flatAllResults = results.flat();
-                            resolve(flatAllResults);
-                        })
-                        .catch (reject);
-                    })
-                    .catch (reject);
-                }
+                    }               
             }
             else{
                 reject('La ruta no existe');
@@ -69,16 +68,16 @@ function mdLinks(path,options){
 //const path = ('../src/pruebas/prueba1.md');
 //const path = ('../src/pruebas/text.txt');
 const path = ('../src/pruebas/');
-const options = {validate: true};
+const options = {validate: false};
 const resultFunction = mdLinks(path, options);
 resultFunction
 .then(function (result) {
-    console.log(result, 'Es este...')
+    console.log(result)
     return result;
 })
 .catch(
     function (error) {
-    console.log(error)
+    //console.error(error)
 });
 
 module.exports = {

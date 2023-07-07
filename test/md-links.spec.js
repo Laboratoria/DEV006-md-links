@@ -1,23 +1,26 @@
 const { mdLinks } = require('../src/index.js');
 const fs = require('fs');
-//const path = require('path');
 const { JSDOM } = require('jsdom');
 const MarkdownIt = require ('markdown-it'); 
 const { validateFile,
         isAbsolute,
         extractLinks,
         verifyLinks,
-        readTextFile 
+        readTextFile,
+        readDirectory,
+        validateMd 
       } = require ('../src/functions'); 
 
 const path = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md';
 const options = { validate: true};
 const axios = require ('axios');
 
+// Test: **** MDLinks ****
+
 describe('mdLinks', () => {
-  it('debería retornar una promesa que se resuelve con un array de objetos', async() => {
+  it('debería retornar una promesa que se resuelve con un array de objetos', (done) => {
     const result = mdLinks(path, options);
-    await expect(result).resolves.toEqual([
+    expect(result).resolves.toEqual([
       {
         Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
         Texto: 'Hotmail',
@@ -39,11 +42,12 @@ describe('mdLinks', () => {
         Codigo: 200,
         Estado: 'OK'
       }
-      ])//.then(done);
+    ]).then(done);
   });
 });
 
-// Validar **si existe** el archivo
+// Test: ***** validateFile *****
+
 describe ('validateFile',  () =>{
   test ('Deberá retornar True si el archivo existe', () =>{
   const filePath = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md';
@@ -51,13 +55,14 @@ describe ('validateFile',  () =>{
   expect(result).toBe(true);  
   });
   test ('Deberá retornar False si el archivo no existe', () =>{
-  const filePath = '..\src\pruebas\prueba1.md';  
+  const filePath = '..\\src\\pruebas\\prueba1.md';  
   const result = validateFile(filePath);
   expect(result).toBe(false);
 });
 });
 
-// Validar si la ruta **es absoluta**
+// Test: ***** isAbsolute *****
+
 describe ('isAbsolute', () =>{
   test('Deberá retornar true si la ruta es absoluta', () =>{
     const filePath = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md';
@@ -65,13 +70,14 @@ describe ('isAbsolute', () =>{
     expect(result).toBe(true);
   });
   test('Deberá retornar false si la ruta no es absoluta', () =>{
-    const filePath = '\src\pruebas\prueba1.md';
+    const filePath = '..\\src\\pruebas\\prueba1.md';
     const result = isAbsolute(filePath);
     expect(result).toBe(false);
 });
 });
 
-// Validar la función **extractLinks** con mocks de la dependencia 'jsdom'
+// Test: ***** extractLinks ***** con mocks de la dependencia 'jsdom'
+
 // Este mock se utiliza para simular el comportamiento de un navegador en un entorno de prueba
   jest.mock('jsdom', () => ({
     JSDOM: jest.fn().mockImplementation(() => {
@@ -101,118 +107,58 @@ describe ('isAbsolute', () =>{
     describe ('extractLinks', () => {
       test ('Deberá extraer los enlaces correctamente', () =>{
         const data = 'Algo de texto';
-        const fileName = 'src/pruebas/prueba2.md';
+        const fileName = 'src/pruebas/prueba1.md';
 
         const result= extractLinks(data, fileName);
         expect(result).toEqual([ //Verifica que el resultado de la función sea igual al objeto esperado
-          { Link: 'http://www.hotmailll.com/', Texto: 'Hotmail', Ruta: 'src/pruebas/prueba2.md'},
-          { Link: 'https://www.youtubeeee.com/', Texto:'Youtube', Ruta: 'src/pruebas/prueba2.md'},
-          { Link: 'http://www.google.com/', Texto:'Google', Ruta: 'src/pruebas/prueba2.md'},
+          { Link: 'http://www.hotmailll.com/', Texto: 'Hotmail', Ruta: 'src/pruebas/prueba1.md'},
+          { Link: 'https://www.youtubeeee.com/', Texto:'Youtube', Ruta: 'src/pruebas/prueba1.md'},
+          { Link: 'http://www.google.com/', Texto:'Google', Ruta: 'src/pruebas/prueba1.md'},
         ]);
       });
     });
-
-    // // Validar la función **verifyLinks**
-    //  const axios = require('axios');
-    //   jest.mock('axios'); // Crea un mock para axios.get
-    //   test('verifyLinks retorna un array de links con su validación', async () =>{
-    //    // Define los enlaces de prueba
-    //   const links = [
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Hotmail',
-    //       Link: 'http://www.hotmailll.com/'
-    //     },
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Youtube',
-    //       Link: 'https://www.youtubeeee.com/'
-    //     },
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Google',
-    //       Link: 'http://www.google.com/'
-    //     }
-    //   ];
-    //   // Define los resultados esperados
-    //   const expectedResults = [
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Hotmail',
-    //       Link: 'http://www.hotmailll.com/',
-    //       Codigo: null,
-    //       Estado: 'No se pudo acceder al enlace'
-    //     },
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Youtube',
-    //       Link: 'https://www.youtubeeee.com/',
-    //       Codigo: null,
-    //       Estado: 'No se pudo acceder al enlace'
-    //     },
-    //     {
-    //       Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md',
-    //       Texto: 'Google',
-    //       Link: 'http://www.google.com/',
-    //       Codigo: 200,
-    //       Estado: 'OK'
-    //     }
-    //   ];
-    //   //Configura el mock de axios.get para simular respuestas exitosas o fallidas
-    //     axios.get.mockImplementation((url) =>{
-    //       if (url === 'http://www.hotmailll.com/') {
-    //         return Promise.reject({Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Hotmail', Link: 'http://www.hotmailll.com/', Codigo: null, Estado: 'No se pudo acceder al enlace'});
-    //     } else if (url === 'https://www.youtubeeee.com/') {
-    //       return Promise.reject({Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Youtube', Link: 'https://www.youtubeeee.com/', Codigo: null, Estado: 'No se pudo acceder al enlace'});
-    //       } else if (url === 'http://www.google.com/'){
-    //       return Promise.resolve({Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Google', Link: 'http://www.google.com/', Codigo: 200, Estado: 'OK'});
-    //       }
-    //     });
-    //     // Ejecuta la función verifyLinks
-    //     const results = await verifyLinks(links);
-    //     //Verifica que los resultados sean los esperados
-    //     expect(results).toEqual(expectedResults);       
-    // });
  
-//Test de función **verifyLinks**
-const verifyLinksTest = (links) =>{
-  const arrayPromise = links.map((link)=> {
-    //axios.get(link.Link)
-    return axios
-    .get(link.Link)
-    .then ((response) => ({
-      Ruta: link.Ruta,
-      Texto: link.Texto,
-      Link: link.Link,
-      Codigo: response.status,
-      Estado: response.statusText
-    }))
-    .catch((error) => ({
-      Ruta: link.Ruta,
-      Texto: link.Texto,
-      Link: link.Link,
-      Codigo: null,
-      Estado: 'No se pudo acceder al enlace'
-    }));
-});
-  return Promise.all(arrayPromise);
-  };
-  //Define una función de prueba para verifyLinks
-  const testVerifyLinks = async () => {
-    const links = [
-      { Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Hotmail', Link: 'http://www.hotmailll.com/'},
-      { Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Youtube', Link: 'https://www.youtubeeee.com/'},
-      { Ruta: 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md', Texto: 'Google', Link: 'http://www.google.com/'},
-    ];
-    const results = await verifyLinksTest(links);
-    //console.log(results);
-  };
-// Ejecuta la prueba 
-  testVerifyLinks();
+//Test: ***** verifyLinks *****
 
-// Test de función readTextFile
+describe('verifyLinks', () => {
+  it('debería retornar una promesa que se resuelve con el estado y código de los enlaces', () => {
+    const links = [
+      { Link: 'http://www.hotmailll.com/', Texto: 'Hotmail', Ruta: 'src/pruebas/prueba1.md'},
+      { Link: 'https://www.youtubeeee.com/', Texto:'Youtube', Ruta: 'src/pruebas/prueba1.md'},
+      { Link: 'http://www.google.com/', Texto:'Google', Ruta: 'src/pruebas/prueba1.md'},
+    ];
+
+    return verifyLinks(links).then((results) => {
+      expect(results).toEqual([
+        {
+          Ruta: 'src/pruebas/prueba1.md',
+          Texto: 'Hotmail',
+          Link: 'http://www.hotmailll.com/',
+          Codigo: null,
+          Estado: 'No se pudo acceder al enlace'
+        },
+        {
+          Ruta: 'src/pruebas/prueba1.md',
+          Texto: 'Youtube',
+          Link: 'https://www.youtubeeee.com/',
+          Codigo: null,
+          Estado: 'No se pudo acceder al enlace'
+        },
+        {
+          Ruta: 'src/pruebas/prueba1.md',
+          Texto: 'Google',
+          Link: 'http://www.google.com/',
+          Codigo: 200,
+          Estado: 'OK'
+        }      
+      ]);
+    });
+  });
+});
+
+// Test: ***** readTextFile *****
 const { promisify } = require('util');
-const readTextAsync = promisify(fs.readFile);
+//const readTextAsync = promisify(fs.readFile);
 describe('readTextFile', () => {
   test('Debe leer el archivo de texto y resolver con el contenido del archivo', () => {
     const filePath = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas\\prueba1.md';
@@ -233,4 +179,42 @@ describe('readTextFile', () => {
       expect(error).toBeDefined();
     });
   });
+});
+
+
+// Test: ***** readDirectory & validateMd *****
+// Prueba cuando options.validate es igual a true y isADirectory(resolveIsAbsolute) es true
+it('Debe llamar a verifyLinks por cada enlace extraído cuando validate es verdadero y isADirectory(resolveIsAbsolute) es verdadero', () => {
+  const path = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas';
+  const options = { validate: true };
+  // Asegúrate de que el directorio exista y contenga archivos .md válidos
+  return readDirectory(path)
+    .then((directoryFiles) => {
+      const linksPromises = directoryFiles.map((file) =>
+        readTextFile(file).then((result) => extractLinks(result, file))
+      );
+      return Promise.all(linksPromises);
+    })
+    .then((linksArray) => {
+      const allLinks = linksArray.flat();
+      return verifyLinks(allLinks);
+    })
+});
+
+it('Debe leer el directorio y devolver una lista de archivos .md válidos', () => {
+  const path = 'C:\\Users\\cuc22\\Documents\\Laboratoria\\MD-Links\\DEV006-md-links\\src\\pruebas';
+  return readDirectory(path)
+    .then((result) => {
+      // Verifica que el resultado sea un array
+      expect(Array.isArray(result)).toBe(true);
+
+      // Verifica que cada elemento del array sea un archivo válido con extensión .md
+      result.forEach((file) => {
+        expect(validateMd(file)).toBe(true);
+      });
+    })
+    .catch((error) => {
+      // Si ocurre un error, falla el test
+      expect(error).toBeNull();
+    });
 });

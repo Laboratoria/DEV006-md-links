@@ -8,7 +8,6 @@ function readFile(file){
     const lines = [];
     const reader = readLine.createInterface({
       input: fs.createReadStream(file),
-      output: process.stdout,
       terminal: false
     });
 
@@ -18,9 +17,9 @@ function readFile(file){
       let matches = line.matchAll(markdownLinkRegex);
       for (let match of matches) {
         lines.push({
-          href: match[2],
+          href: match[2], // El primer grupo de captura contiene la URL
           name: nameFile,
-          text: match[1] // El primer grupo de captura contiene la URL
+          text: match[1] 
         }); 
       }
     });
